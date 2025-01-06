@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 
 import Menu from "@/components/Menu";
 import Coin from "@/components/Coin";
+import YourAccount from "@/components/YourAccount";
 import Event from "@/components/popover/Event";
 import Store from "@/components/popover/Store";
 import Pictures from "@/components/popover/Pictures";
@@ -15,11 +16,19 @@ import Account from "@/components/popover/Account";
 import TopNav from "@/components/topNav";
 import { createClient } from "@supabase/supabase-js";
 
-const Map = dynamic(() => import("../../components/Map"), { ssr: false });
+// Dynamically import the Map component without server-side rendering (SSR)
+const Map = dynamic(() => import("../../components/Map"), { ssr: true });
+
+// Initialisation de Supabase
+const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY || ''
+  );
 
 export default function Home() {
   const { data: session } = useSession();
 
+  // Redirect to login if the session is not available
   if (!session) {
     redirect("/Login");
   } else {
